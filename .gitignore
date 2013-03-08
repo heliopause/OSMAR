@@ -1,0 +1,6 @@
+# Ignore junk files
+.DS_Store
+.m~
+
+# Ignore MAT files
+.mat

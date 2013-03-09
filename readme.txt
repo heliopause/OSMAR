@@ -1,7 +1,7 @@
 readme.txt
 
  1. run_first on any image set (flipud and copy to working disk)
- 2. geometric calibration
+ 2. calibrations (geometric and radiometric)
  3. generate source images
  4. viewing angle mapping
  5. incident angle mapping

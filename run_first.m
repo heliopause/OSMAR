@@ -1,7 +1,7 @@
 function [imageHistograms,imageBitDepth] = run_first(inputDirectory,outputDirectory,imageExtension)
 % RUN_FIRST Run this function first to perform some necessary basic image processing
 % 
-% [imageHistograms] = run_first(inputDirectory,outputDirectory,imageExtension)
+% [imageHistograms,imageBitDepth] = run_first(inputDirectory,outputDirectory,imageExtension)
 % takes three strings as input and returns status of image histograms where
 % number of bins is equal to 2^imageBitDepth and bin locations are 0 to 
 % (2^imageBitDepth)-1.

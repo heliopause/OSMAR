@@ -1,6 +1,7 @@
 % script for testing OSMAR functions
 
 close all; clear all; clc;
+addpath(pwd);
 
 % % load config/parameter file OR specify input arguments
 % 
@@ -16,9 +17,18 @@ close all; clear all; clc;
 % % test other scripts
 % dataDirectory = outputDirectory;
 
-% test calibration_geometric script
-imageInputDirectory = '/Volumes/Calibration Data (v2)/07-13-12/pinhole_occluder/';
-imageOutputDirectory = '/Users/justin/Documents/School/Scripps/Jaffe Lab/MURI project/BRDF project/programs/instrument_revision/OSMAR/calibration_data/';
-setColor = 'red';
-calibration_geometric(imageInputDirectory,imageOutputDirectory,setColor);
+% % test calibration_geometric scripts
+% imageInputDirectory = '/Volumes/Calibration Data (v2)/07-13-12/pinhole_occluder/';
+% imageOutputDirectory = '/Users/justin/Documents/School/Scripps/Jaffe Lab/MURI project/BRDF project/programs/instrument_revision/OSMAR/calibration_data/';
+% setColor = 'grn';
+% calibration_geometric(imageInputDirectory,imageOutputDirectory,setColor);
 
+% % perform geometric calibration procedure
+% calibrationImageDirectory = [pwd '/calibration_data/'];
+% setColor = 'grn';
+% calibration_geometric_perform(calibrationImageDirectory,setColor);
+
+% test image undistort routine
+imageInputDirectory = '/Users/justin/Documents/School/Scripps/Jaffe Lab/MURI project/BRDF project/programs/instrument_revision/OSMAR/TEST DATA/inputDirectory/';
+setColor = 'grn';
+calibration_geometric_undistort_image(imageInputDirectory,setColor);

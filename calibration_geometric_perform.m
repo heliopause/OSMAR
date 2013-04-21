@@ -19,7 +19,7 @@ function [] = calibration_geometric_perform(calibrationImageDirectory,setColor)
 % CALIBRATION_GEOMETRIC_GET_POINTS, CALIBRATION_GEOMETRIC_SET_POINTS,
 % CALIBRATION_GEOMETRIC_UNDISTORT_IMAGE
 
-% calibrationImageDirectory = '/Users/justin/Documents/School/Scripps/Jaffe Lab/MURI project/BRDF project/programs/instrument_revision/OSMAR/calibration_data/';
+% calibrationImageDirectory = '/Users/justin/Documents/School/Scripps/Jaffe Lab/MURI project/BRDF project/programs/instrument_revision/OSMAR/calibration_data/geometric/';
 % setColor = 'grn';
 cd([calibrationImageDirectory setColor]);
 

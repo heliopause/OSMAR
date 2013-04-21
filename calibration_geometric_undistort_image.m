@@ -7,19 +7,19 @@
 % since would only need to stretch/compress
 function [] = calibration_geometric_undistort_image(imageInputDirectory,setColor)
 
-mainProgramDirectory = '/Users/justin/Documents/School/Scripps/Jaffe Lab/MURI project/BRDF project/programs/instrument_revision/OSMAR/';
+mainProgramDirectory = pwd;
 if strncmp(setColor,'r',1)
-    addpath([mainProgramDirectory 'calibration_data/red/']);
+    addpath([mainProgramDirectory '/calibration_data/geometric/red/']);
     Calib_Results;
-    rmpath([mainProgramDirectory 'calibration_data/red/']);
+    rmpath([mainProgramDirectory '/calibration_data/geometric/red/']);
 elseif strncmp(setColor,'g',1)
-    addpath([mainProgramDirectory 'calibration_data/grn/']);
+    addpath([mainProgramDirectory '/calibration_data/geometric/grn/']);
     Calib_Results;
-    rmpath([mainProgramDirectory 'calibration_data/grn/']);
+    rmpath([mainProgramDirectory '/calibration_data/geometric/grn/']);
 elseif strncmp(setColor,'b',1)
-    addpath([mainProgramDirectory 'calibration_data/blu/']);
+    addpath([mainProgramDirectory '/calibration_data/geometric/blu/']);
     Calib_Results;
-    rmpath([mainProgramDirectory 'calibration_data/blu/']);
+    rmpath([mainProgramDirectory '/calibration_data/geometric/blu/']);
 end
 
 imageList = dir([imageInputDirectory '*.tiff']);  	% Get list of images
@@ -45,13 +45,14 @@ for iImage = 1:nImages
     imageTemp = double(imread([imageInputDirectory imageName]));
     
     [imageY,imageX] = size(imageTemp);
-    nZeroRows = (imageX - imageY)/2;
+    nZeroRowsHalf = (imageX - imageY)/2;
 
     % make image square by zero padding
-    imageTemp = padarray(imageTemp,nZeroRows,0,'both');
+    % also shift the center point
+    imageTemp = padarray(imageTemp,nZeroRowsHalf,0,'both');
     if iImage == 1
         cc
-        cc(2) = cc(2) + nZeroRows;          % shift center point after zero padding
+        cc(2) = cc(2) + nZeroRowsHalf;
         cc
     end
     

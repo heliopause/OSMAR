@@ -78,7 +78,7 @@ end
 % This would work almost perfectly if not for the reflections. Maybe redo
 % with external light source (other projector)?
 
-rotationCentroidFiles = dir('im_centroid_pts_position_*.mat');
+rotationCentroidFiles = dir([imageWriteDirectory 'im_centroid_pts_position_*.mat']);
 rotationRestart = size(rotationCentroidFiles,1) + 1;
 
 nPinholes = 36;                  % actual number of pinholes (points)
@@ -197,19 +197,19 @@ for iRotation = rotationRestart:nRotations
     end
 
 end
-% save pinhole centroid points to file
-allCentroidPointsFileName = 'im_centroid_pts_corrected.mat';
-if exist(allCentroidPointsFileName,'file')
-    str = input([allCentroidPointsFileName ' already exists, overwrite? [y/n] '],'s');
-    if strncmp(str,'y',1)
-        save([imageWriteDirectory allCentroidPointsFileName],'imageCentroidPointsCorrected','pinholeNumberOrdered');
-        disp([allCentroidPointsFileName ' saved.']);
-    else disp('Not writing file.');
-    end
-else 
-    save([imageWriteDirectory allCentroidPointsFileName],'imageCentroidPointsCorrected','pinholeNumberOrdered');
-    disp([allCentroidPointsFileName ' saved.']);
-end
+% % save pinhole centroid points to file
+% allCentroidPointsFileName = 'im_centroid_pts_corrected.mat';
+% if exist(allCentroidPointsFileName,'file')
+%     str = input([allCentroidPointsFileName ' already exists, overwrite? [y/n] '],'s');
+%     if strncmp(str,'y',1)
+%         save([imageWriteDirectory allCentroidPointsFileName],'imageCentroidPointsCorrected','pinholeNumberOrdered');
+%         disp([allCentroidPointsFileName ' saved.']);
+%     else disp('Not writing file.');
+%     end
+% else 
+%     save([imageWriteDirectory allCentroidPointsFileName],'imageCentroidPointsCorrected','pinholeNumberOrdered');
+%     disp([allCentroidPointsFileName ' saved.']);
+% end
 
 %% Step 3 - Create pinhole ground truth mapping
 % This is the same for any wavelength since it is based on actual pinhole
@@ -241,9 +241,9 @@ save([imageWriteDirectory 'pinhole_positions_actual.mat'],'pinholePositionsActua
 % are in the right order based on the position of the blocked pinhole and
 % the mapping from Step 3.
 
-centroidPointsList = dir('im_centroid_pts_position_*.mat');
+centroidPointsList = dir([imageWriteDirectory 'im_centroid_pts_position_*.mat']);
 nCentroidPoints = size(centroidPointsList,1);
-load(centroidPointsFileName);
+% load(centroidPointsFileName);
 
 % order the found centroid points same as actual pinhole positions
 imageCentroidPointsCalibrated = nan(nPinholes,2,nCentroidPoints);

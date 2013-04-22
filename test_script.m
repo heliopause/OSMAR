@@ -16,16 +16,16 @@ addpath(pwd);
 % % test other scripts
 % dataDirectory = outputDirectory;
 
-% test calibration_geometric scripts
-imageInputDirectory = [pwd '/calibration_data/geometric/pinhole_occluder/'];
-imageOutputDirectory = [pwd '/calibration_data/geometric/'];
-setColor = 'red';
-calibration_geometric_get_points(imageInputDirectory,imageOutputDirectory,setColor);
+% % test calibration_geometric scripts
+% imageInputDirectory = [pwd '/calibration_data/geometric/pinhole_occluder/'];
+% imageOutputDirectory = [pwd '/calibration_data/geometric/'];
+% setColor = 'red';
+% calibration_geometric_get_points(imageInputDirectory,imageOutputDirectory,setColor);
 
-% % perform geometric calibration procedure
-% calibrationImageDirectory = [pwd '/calibration_data/geometric/'];
-% setColor = 'grn';
-% calibration_geometric_perform(calibrationImageDirectory,setColor);
+% perform geometric calibration procedure
+calibrationImageDirectory = [pwd '/calibration_data/geometric/'];
+setColor = 'red';
+calibration_geometric_perform(calibrationImageDirectory,setColor);
 
 % % test image undistort routine
 % imageInputDirectory = outputDirectory;

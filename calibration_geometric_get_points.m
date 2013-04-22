@@ -63,15 +63,15 @@ end
 imageWriteDirectory = [imageOutputDirectory setColor '/'];
 if ~isdir(imageWriteDirectory)
     mkdir(imageWriteDirectory);
-end
-for iRotation = 1:nRotations
-    if iRotation < 10
-        imageName = ['pinhole_occluder_0' num2str(iRotation) '.tif'];
-    else imageName = ['pinhole_occluder_' num2str(iRotation) '.tif'];
+    for iRotation = 1:nRotations
+        if iRotation < 10
+            imageName = ['pinhole_occluder_0' num2str(iRotation) '.tif'];
+        else imageName = ['pinhole_occluder_' num2str(iRotation) '.tif'];
+        end
+        imageTemp = imagesPinholeOccluder(:,:,iRotation);
+        imageTemp = imageTemp/(2^12-1);
+        imwrite(im2uint8(imageTemp),[imageWriteDirectory imageName],'TIFF');
     end
-    imageTemp = imagesPinholeOccluder(:,:,iRotation);
-    imageTemp = imageTemp/(2^12-1);
-    imwrite(im2uint8(imageTemp),[imageWriteDirectory imageName],'TIFF');
 end
 
 %% Step 2 - Obtain pinhole centroid positions
@@ -248,7 +248,7 @@ nCentroidPoints = size(centroidPointsList,1);
 % order the found centroid points same as actual pinhole positions
 imageCentroidPointsCalibrated = nan(nPinholes,2,nCentroidPoints);
 for iCentroidPoint = 1:nCentroidPoints
-    load(centroidPointsList(iCentroidPoint).name);
+    load([imageWriteDirectory centroidPointsList(iCentroidPoint).name]);
     centroidPointsTemp = [imageCentroidPointsCorrectedSinglePosition imageCentroidPointsCorrectedSinglePositionLabels];
     centroidPointsTemp = sortrows(centroidPointsTemp,3);
     imageCentroidPointsCalibrated(:,:,iCentroidPoint) = centroidPointsTemp(:,1:2);

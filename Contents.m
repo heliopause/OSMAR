@@ -16,22 +16,22 @@
 % calibration_geometric_*       - perform geometric camera calibration
 % calibration_radiometric       - perform radiometric camera calibration
 % 
+% generated_source_images       - folder containing source images
+% generate_source_images        - create incident angle projector images
+% 
+% angle_mappings                - folder containing angle mappings
 % angle_mapping_viewing         - obtain viewing angle mapping
 % angle_mapping_incident        - obtain incident angle mapping
-% angle_mappings                - folder containing angle mappings
-% 
-% generate_source_images        - create incident angle projector images
-% generated_source_images       - folder containing source images
 % 
 % process_samples               - process data from sample measurements
 % 
+% calculated_values             - folder containing calculated values
 % calculate_BRDF_values         - calculate BRDF values for processed samples
 % calculate_BRDF_statistics     - calculate BRDF statistics and error
-% calculated_values             - folder containing calculated values
 % 
+% display_plots                 - folder containing plots of results
 % display_BRDF_values           - display BRDF values
 % display_BRDF_statistics       - display BRDF statistics and error
-% display_plots                 - folder containing plots of results
 %
 %
 % HISTORY:

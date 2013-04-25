@@ -1,4 +1,5 @@
- % Script to generate viewing angle mapping from undistorted images
+% Script to generate viewing angle mapping from flipped and undistorted
+% images.
 
 % Procedure
 % 1. Get edge points from rectified calibration image
@@ -150,10 +151,3 @@ for iImage = 1:nImages
     save([mappingSaveDirectory 'viewing_angle_mapping_' wavelengthString '_phi.mat'],'viewingAngleMappingPhi');
     waitforbuttonpress;
 end
-
-% Note: max_true_dist corresponds to the maximum viewing angle as
-% calculated by the center of the edge pinholes. However, the lens aperture
-% actually extends beyond this a little bit. Need to load 'saturated' image
-% captures and find the image circle that way. Then can plot over the
-% viewing angle mapping.
-

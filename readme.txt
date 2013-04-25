@@ -5,7 +5,6 @@ readme.txt
  3. generate source images
  4. viewing angle mapping
  5. incident angle mapping
-		obtain full mapping for projector pixels to incident angle
  6. process samples
 		use all available exposure sets to increase SNR (and reduce saturation)
 			this probably needs to be done first

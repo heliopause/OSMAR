@@ -39,6 +39,7 @@ else
     disp('Processing files...');
     imageInputList = dir([inputDirectory '*.' imageExtension]);
     imageInfo = imfinfo([inputDirectory imageInputList(1).name],imageExtension);
+    % Note: This is not necessarily the TRUE (measured) image bit depth.
     imageBitDepth = imageInfo.BitDepth;
     
     nImages = numel(imageInputList);
@@ -52,7 +53,9 @@ else
         imageHistogram = imhist(imageTemp,2^imageBitDepth);
         imageHistograms(:,iImage) = imageHistogram;
         
-        imwrite(imageTemp,[outputDirectory imageName],imageExtension);
+        newImageName = ['init' imageName(5:end)];
+        
+        imwrite(imageTemp,[outputDirectory newImageName],imageExtension);
     end
     disp('Completed the process.');
 end

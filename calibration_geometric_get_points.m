@@ -32,7 +32,7 @@ positionSubDirectoryBegin = 'position_';
 nRotations = numel(dir([colorSubDirectory positionSubDirectoryBegin '*']));
 
 %% Step 1 - Obtain rotation images
-imageTemp = imread([colorSubDirectory positionSubDirectoryBegin '01/snap0001.tiff']);
+imageTemp = imread([colorSubDirectory positionSubDirectoryBegin '01/init0001.tiff']);
 imagesPinholeOccluder = zeros([size(imageTemp) nRotations]);
 for iRotation = 1:nRotations
     if iRotation < 10
@@ -42,7 +42,7 @@ for iRotation = 1:nRotations
     positionDirectory = [colorSubDirectory positionSubDirectory];
     
     % process each position folder (20 images in each - 10 dark)
-    imageInputList = dir([positionDirectory 'snap*.tiff']);
+    imageInputList = dir([positionDirectory 'init*.tiff']);
     nImages = numel(imageInputList);
     imageTemp = zeros(size(imageTemp));
     for iImage = 1:nImages

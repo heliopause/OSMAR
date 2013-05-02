@@ -1,4 +1,5 @@
 function [newPixelValue] = multiple_exposures_calculate_new(pixelValues,weightingValues,medianPowerRatios)
+% function [newPixelValue] = multiple_exposures_calculate_new(pixelValues,weightingValues,medianPowerRatios)
 % Function to merge multiple exposure images
 %
 % Step 1 - Calculate mean power ratios
@@ -28,10 +29,21 @@ function [newPixelValue] = multiple_exposures_calculate_new(pixelValues,weightin
 % 			where wi = (zi-Zmin OR zmax-zi) depending on zi <= or > .5*(Zmin+Zmax)
 % 				  mPR1 = 1
 
-% close all; clear all; clc;
+% pixelValues and weightingValues are now (h,w,N)
+% medianPowerRatios is still (1,N)
 
-newPixelValueNum = sum(pixelValues(1)*weightingValues(1) + pixelValues(2)*weightingValues(2)/medianPowerRatios(2) + pixelValues(3)*weightingValues(3)/medianPowerRatios(3));
-newPixelValueDen = sum([weightingValues(1) weightingValues(2) weightingValues(3)]);
-newPixelValue = newPixelValueNum/newPixelValueDen;
+nDims = size(pixelValues,3);
+newPixelValueNumer = zeros([size(pixelValues,1) size(pixelValues,2)]);
+newPixelValueDenom = newPixelValueNumer;
+for iDim = 1:nDims
+    newPixelValueNumer = newPixelValueNumer + pixelValues(:,:,iDim).*weightingValues(:,:,iDim)/medianPowerRatios(iDim);
+    newPixelValueDenom = newPixelValueDenom + weightingValues(:,:,iDim);
+end
+
+newPixelValue = newPixelValueNumer./newPixelValueDenom;
+
+% newPixelValueNum = sum(pixelValues(1)*weightingValues(1) + pixelValues(2)*weightingValues(2)/medianPowerRatios(2) + pixelValues(3)*weightingValues(3)/medianPowerRatios(3));
+% newPixelValueDen = sum([weightingValues(1) weightingValues(2) weightingValues(3)]);
+% newPixelValue = newPixelValueNum/newPixelValueDen;
 
 end

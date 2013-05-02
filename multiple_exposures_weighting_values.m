@@ -1,4 +1,4 @@
-function [weightingValue] = multiple_exposures_weighting_values(pixelValue,bitRate)
+function [weightingValue] = multiple_exposures_weighting_values(pixelValue,trueBitDepth)
 % Function to get weighting values
 
 % Step 2 - Determine weighting values for given pixel position
@@ -20,22 +20,16 @@ function [weightingValue] = multiple_exposures_weighting_values(pixelValue,bitRa
 % 		3.	determine the weighting value (wi) for a given pixel intensity based on its
 % 			  value BEFORE adjusting by mPR
 
-% close all; clear all; clc;
-
-% bitRate = 12;
-% pixelValue = 100;
-
 minPixelValue = 0;
-maxPixelValue = 2^bitRate - 1;
+maxPixelValue = 2^trueBitDepth - 1;
 
 middleValue = (1/2) * (minPixelValue + maxPixelValue);
 
-if pixelValue <= middleValue
-    weightingValue = pixelValue - minPixelValue;
-elseif pixelValue > middleValue
-    weightingValue = maxPixelValue - pixelValue;
-end
+lowVec = pixelValue <= middleValue;
+highVec = pixelValue > middleValue;
+weightingValueLow = pixelValue - minPixelValue;
+weightingValueHigh = maxPixelValue - pixelValue;
 
-% weightingValue
+weightingValue = weightingValueLow.*lowVec + weightingValueHigh.*highVec;
 
 end

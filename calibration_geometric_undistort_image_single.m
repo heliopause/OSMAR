@@ -7,6 +7,7 @@
 % since would only need to stretch/compress
 function [imageUndistort] = calibration_geometric_undistort_image_single(imageTemp,setColor)
 
+addpath('/Users/justin/Documents/MATLAB/toolbox_calib/');
 mainProgramDirectory = pwd;
 if strncmp(setColor,'r',1)
     addpath([mainProgramDirectory '/calibration_data/geometric/red/']);
@@ -28,11 +29,7 @@ nZeroRowsHalf = (imageX - imageY)/2;
 % make image square by zero padding
 % also shift the center point
 imageTemp = padarray(imageTemp,nZeroRowsHalf,0,'both');
-if iImage == 1
-    cc
-    cc(2) = cc(2) + nZeroRowsHalf;
-    cc
-end
+cc(2) = cc(2) + nZeroRowsHalf;
 
 % moved into loop since cc was not redefined otherwise
 KK = [fc(1) alpha_c*fc(1) cc(1);0 fc(2) cc(2) ; 0 0 1];

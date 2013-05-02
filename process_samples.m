@@ -25,16 +25,9 @@ addpath(pwd);
 %% Step 1: Load data set parameters
 % -------------------------------------------------------------------
 
-% Acquisition parameters (same for a given instrument, AVT GC1380 here)
-% match = 'init*.tiff';                   % acquired reflectance images
-
-% % Reference values (prevent small or large calculated values)
-% integration_time_reference = 17020;     % [us]
-% power_value_reference = 1e-6;         % [W]
-
 mainFileDir = [pwd '/TEST DATA/inputDirectory/S16/'];
-trueBitDepth = 12;                   	% number of recorded bits per pixel
-integrationTimeMinUS = 17020;        	% microseconds
+trueBitDepth = 12;                   	% number of actual (recorded) bits per pixel
+integrationTimeMinUS = 17020;        	% minimum integration time [microseconds]
 
 % parameters (medium, wavelength, sample location, binning, QC intensity,
 %             integration time, QC timing, gain value)
@@ -53,18 +46,18 @@ for iImageDir = 1:nImageDirs
     paramEndPos = find(subImageDir == ')',1,'last');
     paramStr = subImageDir(paramBeginPos+1:paramEndPos-1);
     
-    % Separate individual parameters from parameter string
+    % separate individual parameters from parameter string
     paramInfo = textscan(paramStr,'%s %s %s %s %s %s %s %s','Delimiter',',');
      
-    % Set wavelength color string
+    % get wavelength color string
     wavelengthStr{1}{iImageDir} = char(paramInfo{2});
 
-    % Set integration time
+    % get integration time
     integrationTimeStrMS = char(paramInfo{6});          % milliseconds [ms]
     integrationTimeMS = str2double(integrationTimeStrMS(1:end-2));
     integrationTime{1}{iImageDir} = integrationTimeMinUS*(integrationTimeMS/round(integrationTimeMinUS/1000));
     
-    % Set gain value
+    % get gain value
     gainValueTemp = char(paramInfo{8});
     if numel(gainValueTemp) == 2
         gainValue{1}{iImageDir} = str2double(gainValueTemp(2));
@@ -89,9 +82,6 @@ for iImageDir = 1:nImageDirs
 end
 
 %% Steps 3 through ?
-% average all dark images for a given set and subtract that from each image
-% make sure to change negative values to 0. For image '2' use dark image
-% '3' since sometimes '1' is weird.
 
 ctrRedWD = 0; ctrGrnWD = 0; ctrBluWD = 0;
 for iImageDir = 1:nImageDirs
@@ -189,9 +179,20 @@ for iWavelength = 1:nWavelengths
         medianPowerRatios(iWavelengthSubDir) = multiple_exposures_mean_power_ratio(powerDir,powerFileBase,powerFileComp);
     end
     
+    % create save directory
+    finalSaveDir = [mainFileDir 'final_' setColor(:,:,iWavelengthSubDir) '/'];
+    if ~exist(finalSaveDir,'dir')
+        mkdir(finalSaveDir);
+    else
+%         disp('Save directory already exists, aborting process.');
+%         continue;
+    end
+    
     % loop over data (even) images
     nImages = size(wavelengthImageInputList,1);
     for iImage = 2:2:nImages
+        imageTemp = nan([imageHeight imageWidth nWavelengthSubDirs]);
+        weightingValues = nan([imageHeight imageWidth nWavelengthSubDirs]);
         for iWavelengthSubDir = 1:nWavelengthSubDirs
             imageName(:,:,iWavelengthSubDir) = wavelengthImageInputList(iImage,iWavelengthSubDir).name;
             imageTemp(:,:,iWavelengthSubDir) = double(imread([wavelengthDir(:,:,iWavelengthSubDir) imageName(:,:,iWavelengthSubDir)]));
@@ -214,37 +215,36 @@ for iWavelength = 1:nWavelengths
                 imageTemp(:,:,iWavelengthSubDir) = process_samples_gain_correction(imageTemp(:,:,iWavelengthSubDir),currentGainValue);
                 disp('Gain response corrected.');
             end
+            
+            % -------------------------------------------------------------------
+            %   Step 5b: Get weighting and pixel values.
+            % -------------------------------------------------------------------
+            imageTempTemp = imageTemp(:,:,iWavelengthSubDir);
+            weightingValues(:,:,iWavelengthSubDir) = multiple_exposures_weighting_values(imageTempTemp,trueBitDepth);            
         end
         
-        imageTempHDR = nan([imageHeight imageWidth]);
-        % iterate over all pixels (slow!)
-        for iPixel = 1:nPixels
-            % -------------------------------------------------------------------
-            %   Step 5b: Get weighting values.
-            % -------------------------------------------------------------------
-            pixelValues = nan(1,nWavelengthSubDirs);
-            weightingValues = nan(1,nWavelengthSubDirs);
-            for iWavelengthSubDir = 1:nWavelengthSubDirs
-                imageTempTemp = imageTemp(:,:,iWavelengthSubDir);
-                pixelValues(iWavelengthSubDir) = imageTempTemp(iPixel);
-                weightingValues(iWavelengthSubDir) = multiple_exposures_weighting_values(pixelValues(iWavelengthSubDir),trueBitDepth);
-            end
-            % -------------------------------------------------------------------
-            %   Step 5c: Get new pixel values.
-            % -------------------------------------------------------------------
-            newPixelValue = multiple_exposures_calculate_new(pixelValues,weightingValues,medianPowerRatios);
-            imageTempHDR(iPixel) = newPixelValue;
-        end
+        % -------------------------------------------------------------------
+        %   Step 5c: Get new pixel values.
+        % -------------------------------------------------------------------
+        imageTempHDR = multiple_exposures_calculate_new(imageTemp,weightingValues,medianPowerRatios);
         
         % -------------------------------------------------------------------
         % Step 6: Undistort normalized image.
         % -------------------------------------------------------------------
-        % Note that image will be square (imageHeight X imageHeight) after this.
+        % Note that image will be square (imageWidth X imageWidth) after this step.
         imageFinal = calibration_geometric_undistort_image_single(imageTempHDR,setColor(:,:,iWavelengthSubDir));
 
-        figure; imshow(imageFinal,[0 2^trueBitDepth-1]); impixelinfo;
-        waitforbuttonpress;
-%         pause(0.5);
+        % -------------------------------------------------------------------
+        % Save and display final image.
+        % -------------------------------------------------------------------
+        currentImageName = imageName(:,:,iWavelengthSubDir);
+        finalImageName = ['final' currentImageName(5:end-5)];
+        save([finalSaveDir finalImageName '.mat'],'imageFinal');
+
+        figure(1000); imshow(imageFinal,[0 max(max(imageFinal))]); impixelinfo;
+%         figure(1000); imshow(imageFinal,[0 2^trueBitDepth-1]); impixelinfo;
+%         waitforbuttonpress;
+        pause(0.25);
         disp(['Processed image ' num2str(iImage) ' of ' num2str(nImages)]);
     end
     
@@ -253,40 +253,13 @@ end
 
 %%
 
-% % % -------------------------------------------------------------------
-% % % Step 4: Normalize by integration time and power value.
-% % % -------------------------------------------------------------------
-% % %     incident_angle_pts = round(im_incident_points(im_ctr,:));
-% % %     incident_angle_theta = viewing_angle_mapping_theta(incident_angle_pts(2),incident_angle_pts(1));
-% % %     cosine_adjustment(im_ctr) = cosd(incident_angle_theta);
-% % %     power_value_adjusted(im_ctr) = power_values(ii/2)*cosine_adjustment(im_ctr);
-% % 
-% %     im_temp = im_temp/(integration_time_us/integration_time_reference);
-% % %     im_temp = im_temp/((power_values(ii/2)/cosine_adjustment(im_ctr))/power_value_reference);
-% %     im_temp = im_temp/(power_values(ii/2)/power_value_reference);
-% % %     im_temp = im_temp/(power_value_adjusted(im_ctr)/power_value_reference);
-% % % -------------------------------------------------------------------
-% % % Save and display corrected image.
-% % % -------------------------------------------------------------------
-% %     im_processed(:,:,im_ctr) = im_temp;
-% % %     figure(200); imagesc(im_processed(:,:,im_ctr)); impixelinfo; colorbar; axis square;
-% % %     title(['image number ' num2str(ii)]);
-% % % %     title(['image number ' num2str(ii) ' shown and has median value ' num2str(median_val(im_ctr))]);
-% % %     waitforbuttonpress;
-% %     pause(.05);
-% % end
-% % 
-% % save_fname = ['im_processed' save_power_fname(13:end)];
-% % if ~exist(['im_processed_' powr_file(1:7) '.mat'],'file')
-% %     disp('Saving file...');
-% %     save(save_fname,'im_processed');
-% %     disp('File saved.');
-% % end
-% % 
-% % % num_ims_actual = num_ims/2;
-% % % figure; plot(1:num_ims_actual,median_val,'b-'); title('averaged values');
-% % % hold on; plot(1:num_ims_actual,mean_val,'r-');
-% % % plot(1:num_ims_actual,median_val,'b.');
-% % % hold off; legend('median','mean');
-% % 
-% % end
+% % -------------------------------------------------------------------
+% % Step 4: Normalize by integration time and power value.
+% % -------------------------------------------------------------------
+% % Reference values (prevent small or large calculated values)
+% integration_time_reference = 17020;     % [us]
+% power_value_reference = 1e-6;         % [W]
+
+%     im_temp = im_temp/(integration_time_us/integration_time_reference);
+%     im_temp = im_temp/(power_values(ii/2)/power_value_reference);
+

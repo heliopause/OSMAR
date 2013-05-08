@@ -22,6 +22,7 @@ addpath(pwd);
 %% Step 1: Load data set parameters
 % -------------------------------------------------------------------
 
+disp('Loading data set parameters...');
 mainFileDir = [pwd '/TEST DATA/inputDirectory/S16/'];
 trueBitDepth = 12;                   	% number of actual (recorded) bits per pixel
 integrationTimeMinUS = 17020;        	% minimum integration time [microseconds]
@@ -63,10 +64,12 @@ for iImageDir = 1:nImageDirs
     end
 
 end
+disp('Done.');
 
 %% Step 2: Perform 'run_first' on image sets
 % This will flip and copy all images to specified working directory.
 
+disp('Performing ''run_first'' on image sets...');
 imageExtension = 'tiff';
 for iImageDir = 1:nImageDirs
     inputDirectory = [mainFileDir subImageDirs{1}{iImageDir} '/'];
@@ -77,6 +80,7 @@ for iImageDir = 1:nImageDirs
     run_first(inputDirectory,outputDirectory,imageExtension);
     disp(['Processed directory ' '~/' subImageDirs{1}{iImageDir} '/']);
 end
+disp('Done.');
 
 %% Steps 3 through 7
 
@@ -90,6 +94,7 @@ for iImageDir = 1:nImageDirs
 % -------------------------------------------------------------------
 %   Step 3a: Calculate dark image and store MAT file.
 % -------------------------------------------------------------------
+    disp('Calculating dark image and storing MAT file...');
     % get image parameters
     imageTemp = imread([initDirectory imageInputList(1).name]);
     imageHeight = size(imageTemp,1);
@@ -128,12 +133,14 @@ for iImageDir = 1:nImageDirs
     end
 end
 clear imageTemp imageDark;
+disp('Done.');
 
 % number of directories for each of R G B wavelengths
 nWavelengthDirs = [numel(redImageDirs) numel(grnImageDirs) numel(bluImageDirs)];
 % indices for wavelength directories (order R G B)
 allWavelengthDirs = [redImageDirs grnImageDirs bluImageDirs];
 
+disp('Beginning processing of all wavelength sets.');
 % iterate over number of wavelengths
 nWavelengths = 3;
 for iWavelength = 1:nWavelengths
@@ -168,6 +175,7 @@ for iWavelength = 1:nWavelengths
     % -------------------------------------------------------------------
     %   Step 5a: Get mean power ratio values.
     % -------------------------------------------------------------------
+    disp('Getting mean power ratio values...');
     powerDir = [mainFileDir 'power/'];
     % everything is relative to first wavelength subdirectory set (used as base)
     % this is generally the set with the highest intensity
@@ -179,7 +187,8 @@ for iWavelength = 1:nWavelengths
         powerFileComp = powerFileNames(:,:,iWavelengthSubDir);
         medianPowerRatios(iWavelengthSubDir) = multiple_exposures_mean_power_ratio(powerDir,powerFileBase,powerFileComp);
     end
-    
+    disp('Done.');
+
     % create save directory
     finalSaveDir = [mainFileDir 'final_' setColor(:,:,iWavelengthSubDir) '/'];
     if ~exist(finalSaveDir,'dir')
@@ -189,6 +198,7 @@ for iWavelength = 1:nWavelengths
 %         continue;
     end
     
+    disp('Processing images for a single wavelength...');
     % loop over data (even) images
     nImages = size(wavelengthImageInputList,1);
     for iImage = 2:2:nImages
@@ -215,11 +225,10 @@ for iWavelength = 1:nWavelengths
             currentGainValue = gainValue{1}{allWavelengthDirs(whichWavelengthDirs(iWavelengthSubDir))};
             if currentGainValue ~= 0
                 imageTemp(:,:,iWavelengthSubDir) = process_samples_gain_correction(imageTemp(:,:,iWavelengthSubDir),currentGainValue);
-                disp('Gain response corrected.');
             end
             
             % -------------------------------------------------------------------
-            %   Step 5b: Get weighting and pixel values.
+            %   Step 5b: Get weighting values.
             % -------------------------------------------------------------------
             imageTempTemp = imageTemp(:,:,iWavelengthSubDir);
             weightingValues(:,:,iWavelengthSubDir) = multiple_exposures_weighting_values(imageTempTemp,trueBitDepth);
@@ -231,13 +240,13 @@ for iWavelength = 1:nWavelengths
         imageTempHDR = multiple_exposures_calculate_new(imageTemp,weightingValues,medianPowerRatios,trueBitDepth);
         
         % -------------------------------------------------------------------
-        % Step 6: Undistort normalized image.
-        % -------------------------------------------------------------------
+        % Step 6: Undistort normalized HDR image map.
+        % -------------------------------------------------------------------        
         % Note that image will be square (imageWidth X imageWidth) after this step.
         imageFinal = calibration_geometric_undistort_image_single(imageTempHDR,setColor(:,:,iWavelengthSubDir));
 
         % -------------------------------------------------------------------
-        % Step 7: Save and display final image.
+        % Step 7: Save and display final HDR image map.
         % -------------------------------------------------------------------
         currentImageName = imageName(:,:,iWavelengthSubDir);
         finalImageName = ['final' currentImageName(5:end-5)];
@@ -246,9 +255,10 @@ for iWavelength = 1:nWavelengths
         figure(1000); imshow(imageFinal,[0 max(max(imageFinal))]); impixelinfo;
 %         waitforbuttonpress;
         pause(0.25);
-        disp(['Processed image ' num2str(iImage) ' of ' num2str(nImages)]);
+        disp(['Processed image ' num2str(iImage) ' of ' num2str(nImages) '.']);
     end
+    disp('Completed processing for one wavelength set.');
     
-    disp('Processed one wavelength...');
 end
+disp('Completed processing for all wavelength sets.');
 

@@ -6,18 +6,15 @@
 % 	4)   correct for gain
 %   5)   perform HDR adjustment
 %   6)   undistort normalized images
-%   7)   normalize based on measurement parameters ???????
-%           divide out integration time ratio (normalize to 17020us)
-%           divide out power reading (normalize to 1uW=1e-6W)
+%   7)   save final HDR image map
 %
 % Note: Image should be loaded once and saved once (no iterim saves). The
 %       final results should be saved as .mat files.
 
-% Want to be able to specify the main image directory, then have the
-% program process each color individually. So, for each main image
-% directory, get list of image subdirs (using loaded NFO file), figure out
-% which ones correspond to which color, and process completely.
-% So there would be three main loops.
+% Specify the main image directory, then the pgoram will process each color
+% individually. For each main image directory, get list of image subdirs
+% (using loaded NFO file), figure out which ones correspond to which color,
+% and process completely. There are three main loops.
 
 close all; clear all; clc;
 addpath(pwd);
@@ -81,7 +78,7 @@ for iImageDir = 1:nImageDirs
     disp(['Processed directory ' '~/' subImageDirs{1}{iImageDir} '/']);
 end
 
-%% Steps 3 through ?
+%% Steps 3 through 7
 
 ctrRedWD = 0; ctrGrnWD = 0; ctrBluWD = 0;
 for iImageDir = 1:nImageDirs
@@ -156,7 +153,7 @@ for iWavelength = 1:nWavelengths
     clear wavelengthSubDir wavelengthDir wavelengthImageInputList;
     clear wavelengthDarkDir imageDark powerFileNames setColor;
     for iWavelengthSubDir = 1:nWavelengthSubDirs
-        wavelengthSubDir(:,:,iWavelengthSubDir) = subImageDirs{1}{allWavelengthDirs(whichWavelengthDirs(iWavelengthSubDir))};
+        wavelengthSubDir(:,:,iWavelengthSubDir) = subImageDirs{1}{allWavelengthDirs(whichWavelengthDirs(iWavelengthSubDir))}
         wavelengthDir(:,:,iWavelengthSubDir) = [mainFileDir wavelengthSubDir(:,:,iWavelengthSubDir) '/init/'];
         wavelengthImageInputList(:,:,iWavelengthSubDir) = dir([wavelengthDir(:,:,iWavelengthSubDir) '*.' imageExtension]);
         % load dark image
@@ -172,9 +169,13 @@ for iWavelength = 1:nWavelengths
     %   Step 5a: Get mean power ratio values.
     % -------------------------------------------------------------------
     powerDir = [mainFileDir 'power/'];
+    % everything is relative to first wavelength subdirectory set (used as base)
+    % this is generally the set with the highest intensity
+    % it is important to know this when calculating BRDF, since the power
+    % file from the base image set is used for comparison to that of the
+    % reference standard
     powerFileBase = powerFileNames(:,:,1);
-    medianPowerRatios(1) = 1;
-    for iWavelengthSubDir = 2:nWavelengthSubDirs
+    for iWavelengthSubDir = 1:nWavelengthSubDirs
         powerFileComp = powerFileNames(:,:,iWavelengthSubDir);
         medianPowerRatios(iWavelengthSubDir) = multiple_exposures_mean_power_ratio(powerDir,powerFileBase,powerFileComp);
     end
@@ -205,6 +206,7 @@ for iWavelength = 1:nWavelengths
             % correct for negative values
             imageTempTemp = imageTemp(:,:,iWavelengthSubDir);
             imageTempTemp(imageTempTemp < 0) = 0;
+            % assign new image
             imageTemp(:,:,iWavelengthSubDir) = imageTempTemp;
             
             % -------------------------------------------------------------------
@@ -220,13 +222,13 @@ for iWavelength = 1:nWavelengths
             %   Step 5b: Get weighting and pixel values.
             % -------------------------------------------------------------------
             imageTempTemp = imageTemp(:,:,iWavelengthSubDir);
-            weightingValues(:,:,iWavelengthSubDir) = multiple_exposures_weighting_values(imageTempTemp,trueBitDepth);            
+            weightingValues(:,:,iWavelengthSubDir) = multiple_exposures_weighting_values(imageTempTemp,trueBitDepth);
         end
         
         % -------------------------------------------------------------------
         %   Step 5c: Get new pixel values.
         % -------------------------------------------------------------------
-        imageTempHDR = multiple_exposures_calculate_new(imageTemp,weightingValues,medianPowerRatios);
+        imageTempHDR = multiple_exposures_calculate_new(imageTemp,weightingValues,medianPowerRatios,trueBitDepth);
         
         % -------------------------------------------------------------------
         % Step 6: Undistort normalized image.
@@ -235,14 +237,13 @@ for iWavelength = 1:nWavelengths
         imageFinal = calibration_geometric_undistort_image_single(imageTempHDR,setColor(:,:,iWavelengthSubDir));
 
         % -------------------------------------------------------------------
-        % Save and display final image.
+        % Step 7: Save and display final image.
         % -------------------------------------------------------------------
         currentImageName = imageName(:,:,iWavelengthSubDir);
         finalImageName = ['final' currentImageName(5:end-5)];
         save([finalSaveDir finalImageName '.mat'],'imageFinal');
 
         figure(1000); imshow(imageFinal,[0 max(max(imageFinal))]); impixelinfo;
-%         figure(1000); imshow(imageFinal,[0 2^trueBitDepth-1]); impixelinfo;
 %         waitforbuttonpress;
         pause(0.25);
         disp(['Processed image ' num2str(iImage) ' of ' num2str(nImages)]);
@@ -250,16 +251,4 @@ for iWavelength = 1:nWavelengths
     
     disp('Processed one wavelength...');
 end
-
-%%
-
-% % -------------------------------------------------------------------
-% % Step 4: Normalize by integration time and power value.
-% % -------------------------------------------------------------------
-% % Reference values (prevent small or large calculated values)
-% integration_time_reference = 17020;     % [us]
-% power_value_reference = 1e-6;         % [W]
-
-%     im_temp = im_temp/(integration_time_us/integration_time_reference);
-%     im_temp = im_temp/(power_values(ii/2)/power_value_reference);
 

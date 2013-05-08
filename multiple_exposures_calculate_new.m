@@ -1,4 +1,4 @@
-function [newPixelValue] = multiple_exposures_calculate_new(pixelValues,weightingValues,medianPowerRatios)
+function [newPixelValue] = multiple_exposures_calculate_new(pixelValues,weightingValues,medianPowerRatios,trueBitDepth)
 % function [newPixelValue] = multiple_exposures_calculate_new(pixelValues,weightingValues,medianPowerRatios)
 % Function to merge multiple exposure images
 %
@@ -32,15 +32,24 @@ function [newPixelValue] = multiple_exposures_calculate_new(pixelValues,weightin
 % pixelValues and weightingValues are now (h,w,N)
 % medianPowerRatios is still (1,N)
 
+satVal = 2^trueBitDepth-1;
 nDims = size(pixelValues,3);
 newPixelValueNumer = zeros([size(pixelValues,1) size(pixelValues,2)]);
 newPixelValueDenom = newPixelValueNumer;
+valIsZero = nan([size(pixelValues,1) size(pixelValues,2) nDims]);
+valIsSat = valIsZero;
 for iDim = 1:nDims
+    valIsZero(:,:,iDim) = (weightingValues(:,:,iDim) == 0) & (pixelValues(:,:,iDim) == 0);
+    valIsSat(:,:,iDim) = (weightingValues(:,:,iDim) == 0) & (pixelValues(:,:,iDim) == satVal);
     newPixelValueNumer = newPixelValueNumer + pixelValues(:,:,iDim).*weightingValues(:,:,iDim)/medianPowerRatios(iDim);
     newPixelValueDenom = newPixelValueDenom + weightingValues(:,:,iDim);
 end
 
+whichAreZero = (sum(valIsZero,3) == nDims);
+whichAreSat = (sum(valIsSat,3) == nDims);
 newPixelValue = newPixelValueNumer./newPixelValueDenom;
+newPixelValue(whichAreZero) = 0;
+newPixelValue(whichAreSat) = satVal;
 
 % newPixelValueNum = sum(pixelValues(1)*weightingValues(1) + pixelValues(2)*weightingValues(2)/medianPowerRatios(2) + pixelValues(3)*weightingValues(3)/medianPowerRatios(3));
 % newPixelValueDen = sum([weightingValues(1) weightingValues(2) weightingValues(3)]);

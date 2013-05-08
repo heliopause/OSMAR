@@ -13,8 +13,7 @@ function [weightingValue] = multiple_exposures_weighting_values(pixelValue,trueB
 %   	  		this is what the Debevec and Malik weighting function does anyway
 %   	  			w(z) = z-Zmin 	for z <= 1/2 * (Zmin+Zmax)
 %   	  				   Zmax-z	for	z >  1/2 * (Zmin+Zmax)
-%   	  		yes, of course... since w(z) is increasingly small for undersaturated and
-%   	  		  oversaturated values
+%   	  		note w(z) is increasingly small for values near saturation
 
 % 		2. 	for each image, iterate through every pixel position
 % 		3.	determine the weighting value (wi) for a given pixel intensity based on its

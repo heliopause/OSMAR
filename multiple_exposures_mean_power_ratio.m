@@ -104,7 +104,7 @@ end
 % subplot(3,1,2); plot(compPowerPeaksAdjust);
 % subplot(3,1,3); plot(peaksCorrelationAdjust(1:numel(basePowerPeaksAdjust)));
 
-powerRatio = basePowerPeaksAdjust ./ compPowerPeaksAdjust;
+powerRatio = compPowerPeaksAdjust ./ basePowerPeaksAdjust;
 powerRatio(isinf(powerRatio)) = nan;
 figure; plot(powerRatio,'-b'); hold on;
 powerRatioFilt = medfilt1(powerRatio,10);

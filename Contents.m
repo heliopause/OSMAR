@@ -4,7 +4,8 @@
 % This is a set of MATLAB code that allows for calibration and processing
 % of data gathered from the OSMAR (Optical Scatterometer for Measurement of
 % Angular Reflectance) instrument.
-%
+% 
+% 
 % FILES:
 %
 % Contents                      - this file (needed for matlab help)
@@ -23,7 +24,9 @@
 % angle_mapping_viewing         - obtain viewing angle mapping
 % angle_mapping_incident        - obtain incident angle mapping
 % 
-% process_samples               - process data from sample measurements
+% multiple_exposure_*           - perform multiple exposure integration
+% 
+% process_samples_*             - process data from sample measurements
 % 
 % calculated_values             - folder containing calculated values
 % calculate_BRDF_values         - calculate BRDF values for processed samples
@@ -33,7 +36,7 @@
 % display_BRDF_values           - display BRDF values
 % display_BRDF_statistics       - display BRDF statistics and error
 %
-%
+% 
 % HISTORY:
 %
 % Ver  1.0 - --- 2012  - Initial version

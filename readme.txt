@@ -9,6 +9,7 @@ readme.txt
 		use all available exposure sets to increase SNR (and reduce saturation)
 			this probably needs to be done first
 				but possibly after gain correction (think about this)
+			see Debevec and Malik (1997)
  7. perform normal estimation to correct for non-planar surface
 		basically, find actual incident angle for given measurement
 			currently, assumption is that sample is flat, since incident angles
@@ -17,5 +18,6 @@ readme.txt
 		with ERROR BARS (see Foo thesis, OSE book)
 			not sure how to incorporate misfocus (human error)
  9. enable combination of all three wavelengths
+ 		have to scale the image maps properly (spatially and intensity-wise)
  		should be able to specify a particular visual response
 10.	create mathematical models

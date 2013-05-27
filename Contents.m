@@ -27,6 +27,8 @@
 % multiple_exposure_*           - perform multiple exposure integration
 % 
 % process_samples_*             - process data from sample measurements
+%
+% normal_estimation             - estimate angle of surface tilt
 % 
 % calculated_values             - folder containing calculated values
 % calculate_BRDF_values         - calculate BRDF values for processed samples

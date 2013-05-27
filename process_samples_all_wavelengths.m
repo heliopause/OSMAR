@@ -1,4 +1,4 @@
-% function process_samples(mainFileDir)
+function process_samples(mainFileDir)
 % This is a full processing script that will:
 % 
 % 	1)   load data set parameters
@@ -12,19 +12,19 @@
 % Note: Image should be loaded once and saved once (no iterim saves). The
 %       final results should be saved as .mat files.
 
-% Specify the main image directory, then the program will process each color
+% Specify the main image directory, then the pgoram will process each color
 % individually. For each main image directory, get list of image subdirs
 % (using loaded NFO file), figure out which ones correspond to which color,
 % and process completely. There are three main loops.
 
-close all; clear all; clc;
+% close all; clear all; clc;
 addpath(pwd);
 
 %% Step 1: Load data set parameters
 % -------------------------------------------------------------------
 
 disp('Loading data set parameters...');
-mainFileDir = [pwd '/TEST DATA/inputDirectory/D10/'];
+% mainFileDir = [pwd '/TEST DATA/inputDirectory/D40/'];
 trueBitDepth = 12;                   	% number of actual (recorded) bits per pixel
 integrationTimeMinUS = 17020;        	% minimum integration time [microseconds]
 
@@ -137,32 +137,14 @@ clear imageTemp imageDark;
 disp('Done.');
 
 % number of directories for each of R G B wavelengths
-if ~exist('redImageDirs','var')
-    nRedImageDirs = 0;
-    redImageDirs = 0;
-else nRedImageDirs = numel(redImageDirs);
-end
-if ~exist('grnImageDirs','var')
-    nGrnImageDirs = 0;
-    grnImageDirs = 0;
-else nGrnImageDirs = numel(grnImageDirs);
-end
-if ~exist('bluImageDirs','var')
-    nBluImageDirs = 0;
-    bluImageDirs = 0;
-else nBluImageDirs = numel(bluImageDirs);
-end
-nWavelengthDirs = [nRedImageDirs nGrnImageDirs nBluImageDirs];
-nWavelengths = sum(nWavelengthDirs ~= 0);
+nWavelengthDirs = [numel(redImageDirs) numel(grnImageDirs) numel(bluImageDirs)];
 % indices for wavelength directories (order R G B)
 allWavelengthDirs = [redImageDirs grnImageDirs bluImageDirs];
-allWavelengthDirs = allWavelengthDirs(allWavelengthDirs ~= 0);
-presentWavelengths = [1 2 3].*(nWavelengthDirs ~= 0);
-presentWavelengths = presentWavelengths(presentWavelengths ~= 0);
 
 disp('Beginning processing of all wavelength sets.');
 % iterate over number of wavelengths
-for iWavelength = presentWavelengths
+nWavelengths = 3;
+for iWavelength = 1:nWavelengths
     
     % iterate over number of directories for each wavelength (order R G B)
     % may be simpler to just use a counter
@@ -273,7 +255,7 @@ for iWavelength = presentWavelengths
 
         figure(1000); imshow(imageFinal,[0 max(max(imageFinal))]); impixelinfo;
 %         waitforbuttonpress;
-        pause(0.05);
+        pause(0.25);
         disp(['Processed image ' num2str(iImage) ' of ' num2str(nImages) '.']);
     end
     disp('Completed processing for one wavelength set.');

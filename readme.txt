@@ -15,7 +15,8 @@ readme.txt
 			currently, assumption is that sample is flat, since incident angles
 			  were estimated using mirror in sample position
  8. calculate BRDF and display results
-		with ERROR BARS (see Foo thesis, OSE book)
+		need to properly deal with tilted surfaces (see 7.)
+		include ERROR BARS (see Foo thesis, OSE book)
 			not sure how to incorporate misfocus (human error)
  9. enable combination of all three wavelengths
  		have to scale the image maps properly (spatially and intensity-wise)

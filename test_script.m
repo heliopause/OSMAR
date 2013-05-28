@@ -3,18 +3,19 @@
 close all; clear all; clc;
 addpath(pwd);
 
-% % load config/parameter file OR specify input arguments
-% inputDirectory = [pwd '/TEST DATA/inputDirectory/S16a-8 (air, blu, mid-behind-head, 2x2, .4, 17ms, 2-10, g0)/'];
-% % outputDirectory = '/Users/justin/Desktop/Hatchetfish test data/test/';
-% % inputDirectory = 'TEST DATA/inputDirectory/';
+% load config/parameter file OR specify input arguments
+inputDirectory = [pwd '/TEST DATA/inputDirectory/D40/D40a-1 (air, grn, center, 2x2, 1, 102ms, 2-10, g0)/'];
+% outputDirectory = '/Users/justin/Desktop/Hatchetfish test data/test/';
+% inputDirectory = 'TEST DATA/inputDirectory/';
 % outputDirectory = [pwd '/TEST DATA/outputDirectory/'];
+outputDirectory = [inputDirectory 'init/'];
 
 % inputDirectory = [pwd '/calibration_data/geometric/original_images/mirror_images/E02 pixels_15x15_blu_2/'];
 % outputDirectory = [pwd '/calibration_data/geometric/blu/E02 pixels_15x15_blu_2/'];
-% imageExtension = 'tiff';
+imageExtension = 'tiff';
 
-% % test run_first with directory input
-% [imageHistograms,imageBitDepth] = run_first(inputDirectory,outputDirectory,imageExtension);
+% test run_first with directory input
+[imageHistograms,imageBitDepth] = run_first(inputDirectory,outputDirectory,imageExtension);
 
 % % test other scripts
 % dataDirectory = outputDirectory;

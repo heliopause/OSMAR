@@ -24,7 +24,7 @@ addpath(pwd);
 % -------------------------------------------------------------------
 
 disp('Loading data set parameters...');
-mainFileDir = [pwd '/TEST DATA/inputDirectory/D10/'];
+mainFileDir = [pwd '/TEST DATA/inputDirectory/D40/'];
 trueBitDepth = 12;                   	% number of actual (recorded) bits per pixel
 integrationTimeMinUS = 17020;        	% minimum integration time [microseconds]
 

@@ -16,9 +16,4 @@ readme.txt
 			  were estimated using mirror in sample position
  8. calculate BRDF and display results
 		need to properly deal with tilted surfaces (see 7.)
-		include ERROR BARS (see Foo thesis, OSE book)
-			not sure how to incorporate misfocus (human error)
- 9. enable combination of all three wavelengths
- 		have to scale the image maps properly (spatially and intensity-wise)
- 		should be able to specify a particular visual response
-10.	create mathematical models
+ 9.	create mathematical models

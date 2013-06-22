@@ -7,8 +7,7 @@
 %
 % load .mat files generated from 'process_samples' and iterate through
 % while determining max intensity point
-% also load incident angle mappings and plot corresponding initial incident
-% angle
+% also load incident angle mappings and plot corresponding initial incident angle
 
 close all; clear all; clc;
 

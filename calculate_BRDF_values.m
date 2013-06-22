@@ -8,7 +8,7 @@ addpath('/Users/justin/Documents/MATLAB/circle_fit/');
 whichSetToProcess = 'D10';
 expectedBRDF = str2double(whichSetToProcess(2:3))/(100*pi);
 % select color to process
-whichColor = 'grn';
+whichColor = 'blu';
 % where to save BRDF mappings
 mainSaveDirBRDF = [pwd '/TEST DATA/outputDirectory/'];
 saveDirBRDF = [mainSaveDirBRDF whichSetToProcess '/' whichColor '/'];

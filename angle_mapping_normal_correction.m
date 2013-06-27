@@ -27,6 +27,8 @@ close all; clear all; clc;
 normal_estimation;
 thetaTilt = mean(modeThetaValueFromHistogram);
 phiTilt = mean(modePhiValueFromHistogram);
+% test values
+% thetaTilt = 30;
 
 % get tilt axis vector
 maxThetaValue = max(max(viewingAngleMappingTheta));
@@ -60,7 +62,10 @@ Xp = newPoints(1,:); Yp = newPoints(2,:); Zp = newPoints(3,:);
 
 % reshape angle mappings
 viewingAngleMappingThetaCorrected = 90-(reshape(thetaCorrectedVec,680,680)*180/pi);
-viewingAngleMappingPhiCorrected = (reshape(phiCorrectedVec,680,680)*180/pi)+180;
+viewingAngleMappingPhiCorrected = (reshape(phiCorrectedVec,680,680)*180/pi);
+% define new phi = 0 as phiTilt
+negativeIdx = viewingAngleMappingPhiCorrected < 0;
+viewingAngleMappingPhiCorrected(negativeIdx) = viewingAngleMappingPhiCorrected(negativeIdx)+360;
 
 % plot old and new angle mappings for comparison
 figure; subplot(1,2,1); imagesc(viewingAngleMappingTheta); colorbar; axis square; impixelinfo;
@@ -72,10 +77,47 @@ title('original phi mapping');
 subplot(1,2,2); imagesc(viewingAngleMappingPhiCorrected); colorbar; axis square; impixelinfo;
 title('corrected phi mapping');
 
-% THINK A BIT MORE ABOUT HOW TO HANDLE PHI %
-
 %% incident angles
-% 
+
 % get incident angle coordinates and multiply with rotation matrix
-% index into viewing angle mapping to get new indices
+incidentAnglesActualTheta = incidentAnglesActualAngles(:,1);
+incidentAnglesActualPhi = incidentAnglesActualAngles(:,2);
+[incActX,incActY,incActZ] = sph2cart(incidentAnglesActualPhi*pi/180,(90-incidentAnglesActualTheta)*pi/180,1);
+incidentAnglesActualAnglesNew = (rotateArbAxis*[incActX(:) incActY(:) incActZ(:)]');
+incActXp = incidentAnglesActualAnglesNew(1,:);
+incActYp = incidentAnglesActualAnglesNew(2,:);
+incActZp = incidentAnglesActualAnglesNew(3,:);
+[incPhiCorrectedVec,incThetaCorrectedVec,incRsbOne] = cart2sph(incActXp,incActYp,incActZp);
+
+incidentAnglesActualThetaCorrected = 90-(incThetaCorrectedVec*180/pi);
+incidentAnglesActualPhiCorrected = incPhiCorrectedVec*180/pi;
+incNegativeIdx = incidentAnglesActualPhiCorrected < 0;
+incidentAnglesActualPhiCorrected(incNegativeIdx) = incidentAnglesActualPhiCorrected(incNegativeIdx)+360;
+
+% store corrected incident angles
+incidentAnglesActualAnglesCorrected = [incidentAnglesActualThetaCorrected' incidentAnglesActualPhiCorrected'];
+
+% % index into viewing angle mapping to get new indices
+% % find (x,y) points (indices) for incident point
+% nPoints = size(incidentAnglesActualAnglesCorrected,1);
+% correctedIndexI = nan(nPoints,1);
+% correctedIndexJ = nan(nPoints,1);
+% for iPoint = 1:nPoints
+%     [newIndexI,newIndexJ] = find(floor(viewingAngleMappingThetaCorrected) == floor(incidentAnglesActualThetaCorrected(iPoint))...
+%         & floor(viewingAngleMappingPhi) == floor(incidentAnglesActualPhiCorrected(iPoint)));
+%     % relax condition for match if floor() does not yield result
+%     if isempty(newIndexI) || isempty(newIndexJ)
+%         [newIndexI,newIndexJ] = find(round(viewingAngleMappingThetaCorrected) == round(incidentAnglesActualThetaCorrected(iPoint))...
+%             & round(viewingAngleMappingPhi) == round(incidentAnglesActualPhiCorrected(iPoint)));
+%     end
+% %     if isempty(newIndexI) || isempty(newIndexJ)
+% %         userInputFlag = 1;
+% %         [newIndexJ,newIndexI] = myginput(1,'crosshair');
+% %         newIndexI = round(newIndexI); newIndexJ = round(newIndexJ);
+% %     end
+%     % take the centermost point as the corrected incident point indices
+%     correctedIndexI(iPoint) = median(newIndexI);
+%     correctedIndexJ(iPoint) = median(newIndexJ);
+% end
+
 
